@@ -84,6 +84,28 @@ body {
 .col::-webkit-scrollbar { width: 3px; }
 .col::-webkit-scrollbar-thumb { background: #C1C7D0; border-radius: 2px; }
 .col.drag-over { background: #E6EFFF; }
+.col.collapsed {
+  flex: 0 0 32px !important;
+  cursor: pointer;
+  padding: 10px 5px;
+  overflow: hidden;
+}
+.col.collapsed .col-header {
+  writing-mode: vertical-rl;
+  flex: 1; padding: 0; gap: 0;
+  overflow: hidden; white-space: nowrap;
+}
+.col.collapsed .col-count,
+.col.collapsed .person-chip,
+.col.collapsed .col-chevron,
+.col.collapsed .card,
+.col.collapsed .btn-add { display: none; }
+.col-chevron {
+  background: none; border: none; cursor: pointer;
+  color: #C1C7D0; font-size: 10px; padding: 1px 0 1px 4px;
+  line-height: 1; font-family: inherit; flex-shrink: 0;
+}
+.col-chevron:hover { color: #5E6C84; }
 .col-header {
   font-size: 12px; font-weight: 700; color: #5E6C84; letter-spacing: .04em;
   padding: 2px 4px 6px; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
@@ -301,6 +323,11 @@ function resetBoard() {
   state = defaultState(); save(); renderAll();
 }
 
+function toggleCollapse(p, cId) {
+  const c = col(p, cId); if (!c) return;
+  c.collapsed = !c.collapsed; save(); reRenderCol(p, cId);
+}
+
 // ── LOOKUPS ───────────────────────────────────────────────────────────────────
 function col(p, cId)       { return state[p]?.find(c => c.id === cId); }
 function card(p, cId, dId) { return col(p, cId)?.cards.find(c => c.id === dId); }
@@ -473,7 +500,19 @@ function buildCol(p, c) {
   const titleEl = document.createElement('span'); titleEl.textContent = c.title; hdr.appendChild(titleEl);
   const countEl = document.createElement('span'); countEl.className = 'col-count';
   countEl.textContent = c.cards.filter(x => showDone || !x.done).length; hdr.appendChild(countEl);
+  const chevron = document.createElement('button');
+  chevron.className = 'col-chevron'; chevron.title = 'Collapse';
+  chevron.textContent = '▾';
+  chevron.addEventListener('click', e => { e.stopPropagation(); toggleCollapse(p, c.id); });
+  hdr.appendChild(chevron);
   div.appendChild(hdr);
+
+  if (c.collapsed) {
+    div.classList.add('collapsed');
+    div.title = 'Click to expand';
+    div.addEventListener('click', () => toggleCollapse(p, c.id));
+    return div;
+  }
 
   c.cards.forEach(cd => div.appendChild(buildCard(p, c.id, cd)));
 
