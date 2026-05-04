@@ -165,6 +165,8 @@ body {
 .act.done         { color: #36B37E; }
 .act.done:hover   { background: #E3FCEF; }
 .act.del:hover    { background: #FFEBE6; color: #FF5630; }
+.act.move         { color: #5E6C84; font-size: 13px; }
+.act.move:hover   { background: #DEEBFF; color: #0052CC; }
 
 /* ── CHILDREN ── */
 .children {
@@ -428,6 +430,21 @@ function toggleType(p, cId, id) {
   if (badge) { badge.className='type-badge '+item.type; badge.textContent=item.type==='monitor'?'Monitor':'To Do'; }
 }
 
+function moveUp(p, cId, id) {
+  const c = col(p, cId); if (!c) return;
+  const i = c.cards.findIndex(x => x.id === id);
+  if (i <= 0) return;
+  [c.cards[i-1], c.cards[i]] = [c.cards[i], c.cards[i-1]];
+  save(); reRenderCol(p, cId);
+}
+function moveDown(p, cId, id) {
+  const c = col(p, cId); if (!c) return;
+  const i = c.cards.findIndex(x => x.id === id);
+  if (i < 0 || i >= c.cards.length-1) return;
+  [c.cards[i], c.cards[i+1]] = [c.cards[i+1], c.cards[i]];
+  save(); reRenderCol(p, cId);
+}
+
 function toggleCollapse(p, cId) {
   const c = col(p, cId); if (!c) return;
   c.collapsed = !c.collapsed; save(); reRenderCol(p, cId);
@@ -506,6 +523,15 @@ function buildItem(p, cId, item, depth) {
 
   // Hover actions
   const acts = document.createElement('div'); acts.className = 'card-actions';
+
+  if (depth === 0) {
+    const lb = document.createElement('button'); lb.className='act move'; lb.title='Move left'; lb.textContent='←';
+    lb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); moveUp(p,cId,item.id); });
+    acts.appendChild(lb);
+    const rb = document.createElement('button'); rb.className='act move'; rb.title='Move right'; rb.textContent='→';
+    rb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); moveDown(p,cId,item.id); });
+    acts.appendChild(rb);
+  }
 
   const ub = document.createElement('button'); ub.className='act urgent'; ub.title='Toggle urgent'; ub.textContent='!';
   ub.style.opacity = item.urgent ? '1' : '';
