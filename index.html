@@ -9,20 +9,15 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #F0F2F5;
-  color: #172B4D;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: #F0F2F5; color: #172B4D;
+  height: 100vh; display: flex; flex-direction: column; overflow: hidden;
 }
 
 /* ── HEADER ── */
 .header {
   background: #fff; border-bottom: 1px solid #DFE1E6;
   padding: 0 20px; height: 52px; display: flex;
-  align-items: center; justify-content: space-between;
-  flex-shrink: 0; z-index: 10;
+  align-items: center; justify-content: space-between; flex-shrink: 0;
 }
 .header-left { display: flex; align-items: center; gap: 12px; }
 .logo {
@@ -30,7 +25,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0;
 }
-.header-title { font-size: 16px; font-weight: 600; color: #172B4D; }
+.header-title { font-size: 16px; font-weight: 600; }
 .header-date  { font-size: 12px; color: #6B778C; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 .toggle-label {
@@ -40,17 +35,13 @@ body {
 .toggle-label input { cursor: pointer; accent-color: #0052CC; }
 .btn-header {
   background: #F4F5F7; border: 1px solid #DFE1E6; border-radius: 4px;
-  padding: 5px 10px; font-size: 12px; color: #5E6C84; cursor: pointer;
-  font-family: inherit;
+  padding: 5px 10px; font-size: 12px; color: #5E6C84; cursor: pointer; font-family: inherit;
 }
 .btn-header:hover { background: #EBECF0; }
 
 /* ── LAYOUT ── */
 .board { display: flex; flex: 1; overflow: hidden; }
-.panel {
-  display: flex; flex-direction: column;
-  overflow: hidden; padding: 14px 0 14px 14px;
-}
+.panel { display: flex; flex-direction: column; overflow: hidden; padding: 14px 0 14px 14px; }
 .panel-left  { flex: 0 0 57%; border-right: 2px solid #DFE1E6; }
 .panel-right { flex: 1; }
 .panel-header {
@@ -60,10 +51,7 @@ body {
 .panel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .dot-blue   { background: #0052CC; }
 .dot-purple { background: #6554C0; }
-.panel-label {
-  font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: #6B778C;
-}
+.panel-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B778C; }
 
 /* ── TRACK ── */
 .track {
@@ -76,67 +64,90 @@ body {
 /* ── COLUMN ── */
 .col {
   background: #F4F5F7; border-radius: 8px; padding: 10px 8px;
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex; flex-direction: column; gap: 5px;
   max-height: calc(100vh - 118px); overflow-y: auto; transition: background .1s;
 }
-.panel-left  .col { flex: 0 0 168px; }
-.panel-right .col { flex: 0 0 150px; }
+.panel-left  .col { flex: 0 0 200px; }
+.panel-right .col { flex: 0 0 178px; }
 .col::-webkit-scrollbar { width: 3px; }
 .col::-webkit-scrollbar-thumb { background: #C1C7D0; border-radius: 2px; }
 .col.drag-over { background: #E6EFFF; }
-.col.collapsed .card,
-.col.collapsed .btn-add { display: none; }
+.col.collapsed .card, .col.collapsed .btn-add, .col.collapsed .item-wrapper { display: none; }
 .col.collapsed .col-chevron { color: #5E6C84; }
-.col-chevron {
-  background: none; border: none; cursor: pointer;
-  color: #C1C7D0; font-size: 10px; padding: 1px 0 1px 4px;
-  line-height: 1; font-family: inherit; flex-shrink: 0;
-}
-.col-chevron:hover { color: #5E6C84; }
 .col-header {
   font-size: 12px; font-weight: 700; color: #5E6C84; letter-spacing: .04em;
   padding: 2px 4px 6px; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
-.col-count { font-size: 11px; color: #97A0AF; font-weight: 400; margin-left: auto; }
+.col-count  { font-size: 11px; color: #97A0AF; font-weight: 400; margin-left: auto; }
+.col-chevron {
+  background: none; border: none; cursor: pointer;
+  color: #C1C7D0; font-size: 10px; padding: 1px 0 1px 4px; line-height: 1; font-family: inherit; flex-shrink: 0;
+}
+.col-chevron:hover { color: #5E6C84; }
 .person-chip {
   width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff;
 }
 
-/* ── CARD ── */
+/* ── ITEM WRAPPER ── */
+.item-wrapper { display: flex; flex-direction: column; flex-shrink: 0; }
+
+/* ── CARD (shared base) ── */
 .card {
-  background: #fff; border-radius: 6px; padding: 8px 10px;
+  background: #fff; border-radius: 6px; padding: 7px 9px;
   font-size: 12.5px; line-height: 1.4; color: #172B4D;
   box-shadow: 0 1px 3px rgba(9,30,66,.10), 0 0 0 1px rgba(9,30,66,.04);
   border-left: 3px solid transparent; position: relative;
-  cursor: default; transition: box-shadow .12s; word-break: break-word; flex-shrink: 0;
+  transition: box-shadow .12s; word-break: break-word; flex-shrink: 0;
+  display: flex; align-items: flex-start; gap: 5px;
 }
-.card:hover    { box-shadow: 0 3px 8px rgba(9,30,66,.14), 0 0 0 1px rgba(9,30,66,.08); }
-.card.urgent   { border-left-color: #FF5630; }
-.card.done     { opacity: .42; }
+.card:hover { box-shadow: 0 3px 8px rgba(9,30,66,.14), 0 0 0 1px rgba(9,30,66,.08); }
+.card.urgent  { border-left-color: #FF5630; }
+.card.done    { opacity: .42; }
 .card.done .card-text { text-decoration: line-through; }
-.card.editing  { box-shadow: 0 0 0 2px #4C9AFF; }
-.card.dragging { opacity: .3; }
+.card.editing { box-shadow: 0 0 0 2px #4C9AFF; }
+
+/* ── DEPTH STYLES ── */
+.card.d0 {
+  background: #EBF2FF; border-left-color: #0052CC;
+  font-weight: 600; font-size: 12.5px;
+}
+.card.d0.urgent { border-left-color: #FF5630; }
+.panel-right .card.d0 { background: #F0EEFF; border-left-color: #6554C0; }
+.panel-right .card.d0.urgent { border-left-color: #FF5630; }
+
+.card.d1 { background: #fff; }
+.card.d2 { background: #FAFBFC; font-size: 12px; padding: 5px 8px; }
+
+/* ── EXPAND BUTTON ── */
+.item-expand {
+  background: none; border: none; cursor: pointer; color: #97A0AF;
+  font-size: 10px; padding: 1px 0; line-height: 1; font-family: inherit;
+  flex-shrink: 0; margin-top: 2px;
+}
+.item-expand:hover { color: #5E6C84; }
+
+/* ── ITEM BODY ── */
+.item-body { flex: 1; min-width: 0; }
 .card-text {
-  display: block; white-space: pre-wrap; outline: none; min-height: 1em; padding-right: 2px;
+  display: block; white-space: pre-wrap; outline: none; min-height: 1em;
 }
 .card-owner {
-  display: inline-block; margin-top: 5px;
+  display: inline-block; margin-top: 4px;
   font-size: 10px; font-weight: 600; color: #6B778C;
-  background: #F4F5F7; border-radius: 3px; padding: 1px 5px;
+  background: rgba(9,30,66,.06); border-radius: 3px; padding: 1px 5px;
 }
 .type-badge {
   display: inline-flex; align-items: center;
   font-size: 10px; font-weight: 600; letter-spacing: .02em;
-  border-radius: 3px; padding: 1px 6px; margin-top: 5px; margin-left: 3px;
+  border-radius: 3px; padding: 1px 6px; margin-top: 4px; margin-left: 3px;
   cursor: pointer; user-select: none; transition: opacity .12s;
 }
 .type-badge:hover { opacity: .7; }
 .type-badge.todo    { background: #DEEBFF; color: #0052CC; }
 .type-badge.monitor { background: #FFF0B3; color: #974F0C; }
 
-/* action buttons */
+/* ── HOVER ACTIONS ── */
 .card-actions {
   position: absolute; top: 4px; right: 4px; display: none; gap: 2px; align-items: center;
 }
@@ -154,15 +165,23 @@ body {
 .act.done         { color: #36B37E; }
 .act.done:hover   { background: #E3FCEF; }
 .act.del:hover    { background: #FFEBE6; color: #FF5630; }
-.drop-line {
-  height: 3px; background: #4C9AFF; border-radius: 2px; flex-shrink: 0; pointer-events: none;
+
+/* ── CHILDREN ── */
+.children {
+  margin-left: 14px; margin-top: 3px;
+  display: flex; flex-direction: column; gap: 4px;
 }
-.btn-add {
-  background: none; border: none; cursor: pointer; font-size: 12px; color: #97A0AF;
-  padding: 4px 6px; border-radius: 4px; text-align: left; width: 100%;
-  font-family: inherit; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+
+/* ── ADD BUTTONS ── */
+.btn-add, .btn-add-child {
+  background: none; border: none; cursor: pointer;
+  color: #97A0AF; padding: 4px 6px; border-radius: 4px;
+  text-align: left; width: 100%; font-family: inherit; flex-shrink: 0;
+  display: flex; align-items: center; gap: 4px;
 }
-.btn-add:hover { background: rgba(9,30,66,.06); color: #5E6C84; }
+.btn-add       { font-size: 12px; }
+.btn-add-child { font-size: 11px; }
+.btn-add:hover, .btn-add-child:hover { background: rgba(9,30,66,.06); color: #5E6C84; }
 </style>
 </head>
 <body>
@@ -174,9 +193,7 @@ body {
     <span class="header-date" id="hdr-date"></span>
   </div>
   <div class="header-right">
-    <label class="toggle-label">
-      <input type="checkbox" id="toggle-done" checked> Show done
-    </label>
+    <label class="toggle-label"><input type="checkbox" id="toggle-done" checked> Show done</label>
     <button class="btn-header" onclick="exportJSON()">Export JSON</button>
     <button class="btn-header" onclick="resetBoard()" style="color:#FF5630">Reset</button>
   </div>
@@ -200,114 +217,215 @@ body {
 </div>
 
 <script>
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
+function levelLabel(panelKey, depth) {
+  return (panelKey === 'myAreas'
+    ? ['Initiative','Project','Task']
+    : ['Party','Project','Task'])[depth];
+}
+const MAX_DEPTH = 2;
+
+// ── ITEM FACTORY ──────────────────────────────────────────────────────────────
+function mkItem(text, opts) {
+  return Object.assign({ id:uid(), text:text||'', owner:'', urgent:false, done:false, type:'todo', expanded:false, children:[] }, opts);
+}
+
+// ── DEFAULT DATA ──────────────────────────────────────────────────────────────
 function defaultState() {
   return {
     myAreas: [
-      { id:'strategy', title:'Strategy', cards:[
-        { id:uid(), text:'St. Fin. followup',                              owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Humanoids incubation\nAmit touch-base — May 14', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'AI plan',                                         owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Product to use Claude Code',                      owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Help Ari with AI adoption',                       owner:'', urgent:false, done:false, type:'todo' },
+      { id:'strategy', title:'Strategy', collapsed:false, cards:[
+        mkItem('St. Fin. followup'),
+        mkItem('Humanoids incubation', { children:[
+          mkItem('Amit touch-base — May 14', {type:'todo'})
+        ]}),
+        mkItem('AI plan', { children:[
+          mkItem('Product to use Claude Code'),
+          mkItem('Help Ari with AI adoption')
+        ]}),
       ]},
-      { id:'commercial', title:'Commercial', cards:[
-        { id:uid(), text:'StageOne — Idle',    owner:'', urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Super Pharm — Idle', owner:'', urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Wolt — Idle',        owner:'', urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'DD · Shirley — post go-live + B2B?',       owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'DD KPIs · set meeting with Julia / Emma',   owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Verify daily deals & PTT with Ziv',         owner:'', urgent:true,  done:false, type:'todo' },
+      { id:'commercial', title:'Commercial', collapsed:false, cards:[
+        mkItem('StageOne',    {type:'monitor'}),
+        mkItem('Super Pharm', {type:'monitor'}),
+        mkItem('Wolt',        {type:'monitor'}),
+        mkItem('DoorDash', { children:[
+          mkItem('Shirley — post go-live + B2B?'),
+          mkItem('KPIs — set meeting with Julia / Emma'),
+          mkItem('Verify daily deals & PTT with Ziv', {urgent:true}),
+        ]}),
       ]},
-      { id:'people', title:'People', cards:[
-        { id:uid(), text:'Grants', owner:'', urgent:false, done:false, type:'todo' },
+      { id:'people', title:'People', collapsed:false, cards:[
+        mkItem('Grants'),
       ]},
-      { id:'roadmap', title:'Prod. Roadmap', cards:[
-        { id:uid(), text:'Dispatch alternatives → stage', owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'Product roadmap Q2–Q3',         owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'UAT finalize with Austin',      owner:'', urgent:false, done:false, type:'todo' },
+      { id:'roadmap', title:'Prod. Roadmap', collapsed:false, cards:[
+        mkItem('Dispatch alternatives → stage', {urgent:true}),
+        mkItem('Product roadmap Q2–Q3'),
+        mkItem('UAT finalize with Austin'),
       ]},
-      { id:'product', title:'Product', cards:[
-        { id:uid(), text:'Performance & robustness', owner:'System', urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'CFT',                      owner:'David',  urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Platformize',              owner:'Yogev',  urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Maestro',                  owner:'Ziv',    urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Storage',                  owner:'Ziv',    urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'B2B',                      owner:'Yogev',  urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Site management suite',    owner:'David',  urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'Autopoint',                owner:'Yogev',  urgent:false, done:false, type:'monitor' },
-        { id:uid(), text:'RPC',                      owner:'',       urgent:true,  done:false, type:'todo' },
+      { id:'product', title:'Product', collapsed:false, cards:[
+        mkItem('Performance & robustness', {owner:'System', type:'monitor'}),
+        mkItem('CFT',               {owner:'David',  type:'monitor'}),
+        mkItem('Platformize',       {owner:'Yogev',  type:'monitor'}),
+        mkItem('Maestro',           {owner:'Ziv',    type:'monitor'}),
+        mkItem('Storage',           {owner:'Ziv',    type:'monitor'}),
+        mkItem('B2B',               {owner:'Yogev',  type:'monitor'}),
+        mkItem('Site management suite', {owner:'David', type:'monitor'}),
+        mkItem('Autopoint',         {owner:'Yogev',  type:'monitor'}),
+        mkItem('RPC',               {urgent:true}),
       ]},
-      { id:'ai', title:'AI Tools', cards:[
-        { id:uid(), text:'Agent with Claude co-work', owner:'', urgent:false, done:false, type:'todo' },
+      { id:'ai', title:'AI Tools', collapsed:false, cards:[
+        mkItem('Agent with Claude co-work'),
       ]},
     ],
     syncAgendas: [
-      { id:'jack',   title:'Jack',   initials:'JK', color:'#0052CC', cards:[
-        { id:uid(), text:'Network meetings (weekly) — Relay & Acceleration', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'AI adoption plan',     owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Humanoids incubation', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Promotions…',          owner:'', urgent:false, done:false, type:'todo' },
+      { id:'jack',   title:'Jack',   initials:'JK', color:'#0052CC', collapsed:false, cards:[
+        mkItem('Network meetings (weekly)', {children:[
+          mkItem('Relay'), mkItem('Acceleration')
+        ]}),
+        mkItem('AI adoption plan'),
+        mkItem('Humanoids incubation'),
+        mkItem('Promotions…'),
       ]},
-      { id:'jacob',  title:'Jacob',  initials:'JC', color:'#36B37E', cards:[
-        { id:uid(), text:'DD',                                           owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Storage analysis — post results (Dveer, Guy)', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Training — help Precilla, review materials',   owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'DITL — present to them',                       owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Schwartz group — present to Jack',             owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Tesco — offer MFC given Attabotics situation', owner:'', urgent:false, done:false, type:'todo' },
+      { id:'jacob',  title:'Jacob',  initials:'JC', color:'#36B37E', collapsed:false, cards:[
+        mkItem('DD', {children:[
+          mkItem('Max items per bin in catalog'),
+          mkItem('DD B2B — during UAT'),
+        ]}),
+        mkItem('Stock & training', {children:[
+          mkItem('Storage analysis — post results (Dveer, Guy)'),
+          mkItem('Training — help Precilla, review materials'),
+          mkItem('Commissioning — storage limitation'),
+          mkItem('DITL — present to them'),
+        ]}),
+        mkItem('Other', {children:[
+          mkItem('Schwartz group — present to Jack'),
+          mkItem('Tesco — offer MFC given Attabotics situation'),
+          mkItem('Robotic arm business for DD'),
+        ]}),
       ]},
-      { id:'yogev',  title:'Yogev',  initials:'YG', color:'#FF8B00', cards:[
-        { id:uid(), text:'DD-related features',             owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'B2B site design & op model',      owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'TP with multiple modes — design', owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'RPC — pending priorities',        owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'SPH — on hold',                   owner:'', urgent:false, done:false, type:'monitor' },
+      { id:'yogev',  title:'Yogev',  initials:'YG', color:'#FF8B00', collapsed:false, cards:[
+        mkItem('DD-related features',            {urgent:true}),
+        mkItem('B2B site design & op model',     {urgent:true}),
+        mkItem('TP with multiple modes — design',{urgent:true}),
+        mkItem('RPC — pending priorities'),
+        mkItem('SPH — on hold', {type:'monitor'}),
       ]},
-      { id:'david',  title:'David',  initials:'DV', color:'#6554C0', cards:[
-        { id:uid(), text:'Locker integration',                          owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Training for site manager — help Guy',        owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Next phase — simplify site management',       owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'DD — final tests: Dispatch, CFT, Cancellation + training materials', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Flow — agree on tools needed',                owner:'', urgent:false, done:false, type:'todo' },
+      { id:'david',  title:'David',  initials:'DV', color:'#6554C0', collapsed:false, cards:[
+        mkItem('Locker integration'),
+        mkItem('Training for site manager — help Guy'),
+        mkItem('Next phase — simplify site management'),
+        mkItem('DD', {children:[
+          mkItem('Final tests: Dispatch, CFT, Cancellation'),
+          mkItem('Training materials'),
+        ]}),
+        mkItem('Flow — agree on tools needed'),
       ]},
-      { id:'ziv',    title:'Ziv',    initials:'ZV', color:'#00B8D9', cards:[
-        { id:uid(), text:'DD: PTT + Daily deals',          owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'UAT procedure prep → Shalom',    owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Op model sessions — record',     owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'KPIs for DD',                    owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Efficiency racking (Ori leads)', owner:'', urgent:false, done:false, type:'todo' },
+      { id:'ziv',    title:'Ziv',    initials:'ZV', color:'#00B8D9', collapsed:false, cards:[
+        mkItem('DD', {children:[
+          mkItem('PTT + Daily deals'),
+          mkItem('UAT procedure prep → Shalom'),
+          mkItem('Op model sessions — record'),
+          mkItem('KPIs for DD'),
+          mkItem('Integration test plan'),
+          mkItem('Site settings'),
+        ]}),
+        mkItem('Efficiency racking (Ori leads)', {type:'monitor'}),
+        mkItem('Storage — bin type selection algo', {type:'monitor'}),
       ]},
-      { id:'hodaya', title:'Hodaya', initials:'HD', color:'#FF5630', cards:[
-        { id:uid(), text:'How are things going?',                    owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Update & re-sign all consultant contracts', owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'Maya as part-time consultant?',            owner:'', urgent:false, done:false, type:'todo' },
+      { id:'hodaya', title:'Hodaya', initials:'HD', color:'#FF5630', collapsed:false, cards:[
+        mkItem('How are things going?'),
+        mkItem('Update & re-sign all consultant contracts'),
+        mkItem('Maya as part-time consultant?'),
       ]},
-      { id:'shalom', title:'Shalom', initials:'SH', color:'#403294', cards:[
-        { id:uid(), text:'DD performance simulation',                      owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'Robustness / station utilization for on-demand', owner:'', urgent:true,  done:false, type:'todo' },
-        { id:uid(), text:'Shorten LR cycle time',                          owner:'', urgent:false, done:false, type:'todo' },
-        { id:uid(), text:'LR utilization (load balancing)',                owner:'', urgent:false, done:false, type:'todo' },
+      { id:'shalom', title:'Shalom', initials:'SH', color:'#403294', collapsed:false, cards:[
+        mkItem('DD performance simulation',                      {urgent:true}),
+        mkItem('Robustness / station utilization for on-demand', {urgent:true}),
+        mkItem('Performance', {children:[
+          mkItem('Shorten LR cycle time'),
+          mkItem('LR utilization (load balancing)'),
+        ]}),
       ]},
     ]
   };
 }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const LS = 'workboard_v1';
+const LS = 'workboard_v2';
 let state = (() => {
   try { const r = localStorage.getItem(LS); return r ? JSON.parse(r) : defaultState(); }
   catch { return defaultState(); }
 })();
 let showDone = true;
-let drag = null;
 
 function save() { localStorage.setItem(LS, JSON.stringify(state)); }
-
 function resetBoard() {
   if (!confirm('Reset board to default data? This cannot be undone.')) return;
   state = defaultState(); save(); renderAll();
+}
+
+// ── LOOKUPS ───────────────────────────────────────────────────────────────────
+function col(p, cId) { return state[p]?.find(c => c.id === cId); }
+
+function findItem(items, id) {
+  for (const it of items) {
+    if (it.id === id) return it;
+    if (it.children?.length) { const f = findItem(it.children, id); if (f) return f; }
+  }
+  return null;
+}
+
+function removeItem(items, id) {
+  const i = items.findIndex(x => x.id === id);
+  if (i !== -1) { items.splice(i, 1); return true; }
+  return items.some(it => it.children && removeItem(it.children, id));
+}
+
+function colFindItem(p, cId, id) {
+  const c = col(p, cId); return c ? findItem(c.cards, id) : null;
+}
+
+// ── MUTATIONS ─────────────────────────────────────────────────────────────────
+function addTopLevel(p, cId) {
+  const c = col(p, cId); if (!c) return;
+  const item = mkItem(); c.cards.push(item); save(); reRenderCol(p, cId);
+  requestAnimationFrame(() => focusText(item.id));
+}
+
+function addChild(p, cId, parentId) {
+  const parent = colFindItem(p, cId, parentId); if (!parent) return;
+  if (!parent.children) parent.children = [];
+  const item = mkItem(); parent.children.push(item);
+  parent.expanded = true; save(); reRenderCol(p, cId);
+  requestAnimationFrame(() => focusText(item.id));
+}
+
+function deleteItem(p, cId, id) {
+  const c = col(p, cId); if (!c) return;
+  removeItem(c.cards, id); save(); reRenderCol(p, cId);
+}
+
+function toggleExpand(p, cId, id) {
+  const item = colFindItem(p, cId, id); if (!item) return;
+  item.expanded = !item.expanded; save(); reRenderCol(p, cId);
+}
+
+function toggleDone(p, cId, id) {
+  const item = colFindItem(p, cId, id); if (!item) return;
+  item.done = !item.done; save(); reRenderCol(p, cId);
+}
+
+function toggleUrgent(p, cId, id) {
+  const item = colFindItem(p, cId, id); if (!item) return;
+  item.urgent = !item.urgent; save(); reRenderCol(p, cId);
+}
+
+function toggleType(p, cId, id) {
+  const item = colFindItem(p, cId, id); if (!item) return;
+  item.type = (item.type||'todo') === 'todo' ? 'monitor' : 'todo'; save();
+  const badge = document.querySelector('#card-'+id+' .type-badge');
+  if (badge) { badge.className='type-badge '+item.type; badge.textContent=item.type==='monitor'?'Monitor':'To Do'; }
 }
 
 function toggleCollapse(p, cId) {
@@ -315,69 +433,17 @@ function toggleCollapse(p, cId) {
   c.collapsed = !c.collapsed; save(); reRenderCol(p, cId);
 }
 
-// ── LOOKUPS ───────────────────────────────────────────────────────────────────
-function col(p, cId)       { return state[p]?.find(c => c.id === cId); }
-function card(p, cId, dId) { return col(p, cId)?.cards.find(c => c.id === dId); }
-
-// ── MUTATIONS ─────────────────────────────────────────────────────────────────
-function addCard(p, cId) {
-  const c = { id: uid(), text: '', owner: '', urgent: false, done: false, type: 'todo' };
-  col(p, cId).cards.push(c); save(); reRenderCol(p, cId);
-  requestAnimationFrame(() => { const el = document.getElementById('ct-' + c.id); if (el) startEdit(el); });
-}
-
-function deleteCard(p, cId, dId) {
-  const c = col(p, cId); c.cards = c.cards.filter(x => x.id !== dId); save(); reRenderCol(p, cId);
-}
-
-function toggleDone(p, cId, dId) {
-  const c = card(p, cId, dId); if (!c) return;
-  c.done = !c.done; save(); syncCardEl(p, cId, dId); updateCount(p, cId);
-}
-
-function toggleUrgent(p, cId, dId) {
-  const c = card(p, cId, dId); if (!c) return;
-  c.urgent = !c.urgent; save(); syncCardEl(p, cId, dId);
-}
-
-function toggleType(p, cId, dId) {
-  const c = card(p, cId, dId); if (!c) return;
-  c.type = (c.type || 'todo') === 'todo' ? 'monitor' : 'todo'; save();
-  const badge = document.querySelector('#card-' + dId + ' .type-badge');
-  if (badge) { badge.className = 'type-badge ' + c.type; badge.textContent = c.type === 'monitor' ? 'Monitor' : 'To Do'; }
-}
-
-function commitText(p, cId, dId, raw) {
-  const text = raw.trim(); const c = card(p, cId, dId); if (!c) return;
-  if (!text) { deleteCard(p, cId, dId); return; }
-  c.text = text; save();
-}
-
-// ── DOM SYNC ──────────────────────────────────────────────────────────────────
-function syncCardEl(p, cId, dId) {
-  const c = card(p, cId, dId); const el = document.getElementById('card-' + dId);
-  if (!c || !el) return;
-  el.classList.toggle('urgent', c.urgent); el.classList.toggle('done', c.done);
-  el.querySelector('.act.urgent').style.opacity = c.urgent ? '1' : '';
-  el.querySelector('.act.done').style.opacity   = c.done   ? '1' : '';
-  if (!showDone && c.done) el.style.display = 'none';
-}
-
-function updateCount(p, cId) {
-  const c = col(p, cId); if (!c) return;
-  const el = document.querySelector('#col-' + cId + ' .col-count');
-  if (el) el.textContent = c.cards.filter(x => showDone || !x.done).length;
-}
-
-function reRenderCol(p, cId) {
-  const c = col(p, cId); if (!c) return;
-  const track = document.getElementById('track-' + p);
-  const old   = document.getElementById('col-' + cId);
-  const fresh = buildCol(p, c);
-  if (old) track.replaceChild(fresh, old); else track.appendChild(fresh);
+function commitText(p, cId, id, raw) {
+  const text = raw.trim();
+  if (!text) { deleteItem(p, cId, id); return; }
+  const item = colFindItem(p, cId, id); if (!item) return;
+  item.text = text; save();
 }
 
 // ── EDIT ──────────────────────────────────────────────────────────────────────
+function focusText(id) {
+  const el = document.getElementById('ct-'+id); if (el) startEdit(el);
+}
 function startEdit(el) {
   el.contentEditable = 'true'; el.focus();
   el.closest('.card').classList.add('editing');
@@ -388,157 +454,155 @@ function stopEdit(el) {
   el.contentEditable = 'false'; el.closest('.card')?.classList.remove('editing');
 }
 
-// ── BUILD CARD ────────────────────────────────────────────────────────────────
-function buildCard(p, cId, c) {
+// ── BUILD ITEM (recursive) ────────────────────────────────────────────────────
+function buildItem(p, cId, item, depth) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'item-wrapper';
+
+  // Card
   const div = document.createElement('div');
-  div.className = 'card' + (c.urgent ? ' urgent' : '') + (c.done ? ' done' : '');
-  div.id = 'card-' + c.id;
-  if (!showDone && c.done) div.style.display = 'none';
+  div.className = 'card d'+depth + (item.urgent?' urgent':'') + (item.done?' done':'');
+  div.id = 'card-'+item.id;
+  if (!showDone && item.done) div.style.display = 'none';
 
-  div.draggable = true;
-  div.addEventListener('dragstart', e => {
-    drag = { p, cId, cardId: c.id }; e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => div.classList.add('dragging'), 0);
-  });
-  div.addEventListener('dragend', () => {
-    div.classList.remove('dragging');
-    document.querySelectorAll('.drop-line').forEach(x => x.remove()); drag = null;
-  });
-  div.addEventListener('dragover', e => {
-    if (!drag) return; e.preventDefault(); e.stopPropagation();
-    document.querySelectorAll('.drop-line').forEach(x => x.remove());
-    const line = document.createElement('div'); line.className = 'drop-line';
-    const mid  = div.getBoundingClientRect().top + div.getBoundingClientRect().height / 2;
-    div.parentNode.insertBefore(line, e.clientY < mid ? div : div.nextSibling);
-  });
-  div.addEventListener('drop', e => {
-    e.preventDefault(); e.stopPropagation();
-    document.querySelectorAll('.drop-line').forEach(x => x.remove());
-    if (!drag || drag.cardId === c.id) return;
-    const mid = div.getBoundingClientRect().top + div.getBoundingClientRect().height / 2;
-    moveCard(drag.p, drag.cId, drag.cardId, p, cId, c.id, e.clientY < mid);
-  });
-
-  const actions = document.createElement('div'); actions.className = 'card-actions';
-  const urgBtn = document.createElement('button');
-  urgBtn.className = 'act urgent'; urgBtn.title = 'Toggle urgent'; urgBtn.textContent = '!';
-  urgBtn.style.opacity = c.urgent ? '1' : '';
-  urgBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleUrgent(p, cId, c.id); });
-  actions.appendChild(urgBtn);
-
-  const doneBtn = document.createElement('button');
-  doneBtn.className = 'act done'; doneBtn.title = 'Toggle done'; doneBtn.textContent = '✓';
-  doneBtn.style.opacity = c.done ? '1' : '';
-  doneBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleDone(p, cId, c.id); });
-  actions.appendChild(doneBtn);
-
-  const delBtn = document.createElement('button');
-  delBtn.className = 'act del'; delBtn.title = 'Delete'; delBtn.textContent = '×';
-  delBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); deleteCard(p, cId, c.id); });
-  actions.appendChild(delBtn);
-  div.appendChild(actions);
-
-  const textEl = document.createElement('div');
-  textEl.className = 'card-text'; textEl.id = 'ct-' + c.id;
-  textEl.textContent = c.text; textEl.contentEditable = 'false';
-  textEl.addEventListener('click', e => { if (textEl.contentEditable !== 'true') { startEdit(textEl); e.stopPropagation(); } });
-  textEl.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { textEl.textContent = c.text; textEl.blur(); }
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textEl.blur(); }
-  });
-  textEl.addEventListener('blur', () => { stopEdit(textEl); commitText(p, cId, c.id, textEl.textContent); });
-  div.appendChild(textEl);
-
-  if (c.owner) {
-    const own = document.createElement('span');
-    own.className = 'card-owner'; own.textContent = c.owner; div.appendChild(own);
+  // Expand toggle (depth 0 and 1 only)
+  if (depth < MAX_DEPTH) {
+    const xBtn = document.createElement('button');
+    xBtn.className = 'item-expand';
+    xBtn.textContent = item.expanded ? '▾' : '▸';
+    xBtn.title = item.expanded ? 'Collapse' : 'Expand';
+    xBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleExpand(p, cId, item.id); });
+    div.appendChild(xBtn);
   }
 
-  const type = c.type || 'todo';
-  const badge = document.createElement('span');
-  badge.className = 'type-badge ' + type;
-  badge.textContent = type === 'monitor' ? 'Monitor' : 'To Do';
-  badge.addEventListener('click', e => { e.stopPropagation(); toggleType(p, cId, c.id); });
-  div.appendChild(badge);
+  // Body
+  const body = document.createElement('div'); body.className = 'item-body';
 
-  return div;
+  const textEl = document.createElement('div');
+  textEl.className = 'card-text'; textEl.id = 'ct-'+item.id;
+  textEl.textContent = item.text; textEl.contentEditable = 'false';
+  textEl.style.paddingRight = '54px'; // space for action buttons
+  textEl.addEventListener('click', e => { if (textEl.contentEditable !== 'true') { startEdit(textEl); e.stopPropagation(); } });
+  textEl.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { textEl.textContent = item.text; textEl.blur(); }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textEl.blur(); }
+  });
+  textEl.addEventListener('blur', () => { stopEdit(textEl); commitText(p, cId, item.id, textEl.textContent); });
+  body.appendChild(textEl);
+
+  if (item.owner) {
+    const own = document.createElement('span'); own.className = 'card-owner'; own.textContent = item.owner;
+    body.appendChild(own);
+  }
+
+  const type = item.type || 'todo';
+  const badge = document.createElement('span');
+  badge.className = 'type-badge '+type;
+  badge.textContent = type === 'monitor' ? 'Monitor' : 'To Do';
+  badge.addEventListener('click', e => { e.stopPropagation(); toggleType(p, cId, item.id); });
+  body.appendChild(badge);
+
+  div.appendChild(body);
+
+  // Hover actions
+  const acts = document.createElement('div'); acts.className = 'card-actions';
+
+  const ub = document.createElement('button'); ub.className='act urgent'; ub.title='Toggle urgent'; ub.textContent='!';
+  ub.style.opacity = item.urgent ? '1' : '';
+  ub.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleUrgent(p,cId,item.id); });
+  acts.appendChild(ub);
+
+  const db = document.createElement('button'); db.className='act done'; db.title='Toggle done'; db.textContent='✓';
+  db.style.opacity = item.done ? '1' : '';
+  db.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleDone(p,cId,item.id); });
+  acts.appendChild(db);
+
+  const xb = document.createElement('button'); xb.className='act del'; xb.title='Delete'; xb.textContent='×';
+  xb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); deleteItem(p,cId,item.id); });
+  acts.appendChild(xb);
+
+  div.appendChild(acts);
+  wrapper.appendChild(div);
+
+  // Children section (when expanded)
+  if (depth < MAX_DEPTH && item.expanded) {
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'children';
+    (item.children || []).forEach(child => childrenEl.appendChild(buildItem(p, cId, child, depth+1)));
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-child';
+    addBtn.innerHTML = '＋ ' + levelLabel(p, depth+1);
+    addBtn.addEventListener('click', () => addChild(p, cId, item.id));
+    childrenEl.appendChild(addBtn);
+
+    wrapper.appendChild(childrenEl);
+  }
+
+  return wrapper;
 }
 
 // ── BUILD COLUMN ──────────────────────────────────────────────────────────────
 function buildCol(p, c) {
   const div = document.createElement('div');
-  div.className = 'col'; div.id = 'col-' + c.id;
+  div.className = 'col' + (c.collapsed ? ' collapsed' : '');
+  div.id = 'col-'+c.id;
 
-  div.addEventListener('dragover', e => { if (!drag) return; e.preventDefault(); div.classList.add('drag-over'); });
-  div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
-  div.addEventListener('drop', e => {
-    e.preventDefault(); div.classList.remove('drag-over');
-    document.querySelectorAll('.drop-line').forEach(x => x.remove());
-    if (!drag) return;
-    moveCard(drag.p, drag.cId, drag.cardId, p, c.id, null, false);
-  });
-
+  // Header
   const hdr = document.createElement('div'); hdr.className = 'col-header';
   if (c.initials) {
-    const chip = document.createElement('span'); chip.className = 'person-chip';
-    chip.style.background = c.color || '#97A0AF'; chip.textContent = c.initials;
+    const chip = document.createElement('span'); chip.className='person-chip';
+    chip.style.background = c.color||'#97A0AF'; chip.textContent=c.initials;
     hdr.appendChild(chip);
   }
   const titleEl = document.createElement('span'); titleEl.textContent = c.title; hdr.appendChild(titleEl);
-  const countEl = document.createElement('span'); countEl.className = 'col-count';
-  countEl.textContent = c.cards.filter(x => showDone || !x.done).length; hdr.appendChild(countEl);
-  const chevron = document.createElement('button');
-  chevron.className = 'col-chevron'; chevron.title = 'Collapse';
-  chevron.textContent = c.collapsed ? '▸' : '▾';
+  const countEl = document.createElement('span'); countEl.className='col-count';
+  countEl.textContent = c.cards.length; hdr.appendChild(countEl);
+  const chevron = document.createElement('button'); chevron.className='col-chevron';
+  chevron.textContent = c.collapsed ? '▸' : '▾'; chevron.title = 'Collapse / expand';
   chevron.addEventListener('click', e => { e.stopPropagation(); toggleCollapse(p, c.id); });
   hdr.appendChild(chevron);
   div.appendChild(hdr);
 
-  if (c.collapsed) div.classList.add('collapsed');
+  if (!c.collapsed) {
+    c.cards.forEach(item => div.appendChild(buildItem(p, c.id, item, 0)));
 
-  c.cards.forEach(cd => div.appendChild(buildCard(p, c.id, cd)));
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'btn-add'; addBtn.innerHTML = '＋ Add card';
-  addBtn.addEventListener('click', () => addCard(p, c.id));
-  div.appendChild(addBtn);
+    const addBtn = document.createElement('button'); addBtn.className='btn-add';
+    addBtn.innerHTML = '＋ ' + levelLabel(p, 0);
+    addBtn.addEventListener('click', () => addTopLevel(p, c.id));
+    div.appendChild(addBtn);
+  }
 
   return div;
 }
 
-// ── DRAG MOVE ─────────────────────────────────────────────────────────────────
-function moveCard(sp, scId, cardId, dp, dcId, anchorId, before) {
-  const srcCol = col(sp, scId); const dstCol = col(dp, dcId);
-  if (!srcCol || !dstCol) return;
-  const moved = srcCol.cards.find(c => c.id === cardId); if (!moved) return;
-  srcCol.cards = srcCol.cards.filter(c => c.id !== cardId);
-  let idx = anchorId ? dstCol.cards.findIndex(c => c.id === anchorId) : -1;
-  if (idx === -1) idx = dstCol.cards.length; else if (!before) idx++;
-  dstCol.cards.splice(idx, 0, moved); save();
-  reRenderCol(dp, dcId);
-  if (!(sp === dp && scId === dcId)) reRenderCol(sp, scId);
-  drag = null;
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function reRenderCol(p, cId) {
+  const c = col(p, cId); if (!c) return;
+  const track = document.getElementById('track-'+p);
+  const old   = document.getElementById('col-'+cId);
+  const fresh = buildCol(p, c);
+  if (old) track.replaceChild(fresh, old); else track.appendChild(fresh);
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll() {
-  ['myAreas', 'syncAgendas'].forEach(p => {
-    const track = document.getElementById('track-' + p);
+  ['myAreas','syncAgendas'].forEach(p => {
+    const track = document.getElementById('track-'+p);
     track.innerHTML = '';
-    (state[p] || []).forEach(c => track.appendChild(buildCol(p, c)));
+    (state[p]||[]).forEach(c => track.appendChild(buildCol(p, c)));
   });
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 function exportJSON() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'workboard.json' });
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:'workboard.json'});
   a.click(); URL.revokeObjectURL(a.href);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US', {
-  weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  weekday:'short', year:'numeric', month:'short', day:'numeric'
 });
 document.getElementById('toggle-done').addEventListener('change', function() {
   showDone = this.checked; renderAll();
