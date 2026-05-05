@@ -72,13 +72,17 @@ body {
 .col::-webkit-scrollbar { width: 3px; }
 .col::-webkit-scrollbar-thumb { background: #C1C7D0; border-radius: 2px; }
 .col.drag-over { background: #E6EFFF; }
+.col.dragging-opacity { opacity: 0.4; }
+.col-header { cursor: grab; }
+.col-header:active { cursor: grabbing; }
 .col.collapsed .card, .col.collapsed .btn-add, .col.collapsed .item-wrapper { display: none; }
 .col.collapsed .col-chevron { color: #5E6C84; }
 .col-header {
   font-size: 12px; font-weight: 700; color: #5E6C84; letter-spacing: .04em;
   padding: 2px 4px 6px; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
-.col-count  { font-size: 11px; color: #97A0AF; font-weight: 400; margin-left: auto; }
+.col-title  { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.col-count  { font-size: 11px; color: #97A0AF; font-weight: 400; }
 .col-chevron {
   background: none; border: none; cursor: pointer;
   color: #C1C7D0; font-size: 10px; padding: 1px 0 1px 4px; line-height: 1; font-family: inherit; flex-shrink: 0;
@@ -385,6 +389,8 @@ let state = (() => {
   catch { return defaultState(); }
 })();
 let showDone = true;
+let _dragPanel = null;
+let _dragColId = null;
 
 function save() { localStorage.setItem(LS, JSON.stringify(state)); }
 function resetBoard() {
@@ -634,6 +640,37 @@ function buildCol(p, c) {
   const div = document.createElement('div');
   div.className = 'col' + (c.collapsed ? ' collapsed' : '');
   div.id = 'col-'+c.id;
+  div.setAttribute('draggable', 'true');
+
+  div.addEventListener('dragstart', e => {
+    _dragPanel = p; _dragColId = c.id;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => div.classList.add('dragging-opacity'), 0);
+  });
+  div.addEventListener('dragend', () => {
+    div.classList.remove('dragging-opacity');
+    document.querySelectorAll('.col.drag-over').forEach(el => el.classList.remove('drag-over'));
+  });
+  div.addEventListener('dragover', e => {
+    if (_dragPanel !== p) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    div.classList.add('drag-over');
+  });
+  div.addEventListener('dragleave', e => {
+    if (!div.contains(e.relatedTarget)) div.classList.remove('drag-over');
+  });
+  div.addEventListener('drop', e => {
+    e.preventDefault();
+    div.classList.remove('drag-over');
+    if (_dragPanel !== p || _dragColId === c.id) return;
+    const arr = state[p];
+    const from = arr.findIndex(x => x.id === _dragColId);
+    const to   = arr.findIndex(x => x.id === c.id);
+    if (from === -1 || to === -1) return;
+    arr.splice(to, 0, arr.splice(from, 1)[0]);
+    save(); renderPanel(p);
+  });
 
   // Header
   const hdr = document.createElement('div'); hdr.className = 'col-header';
@@ -642,17 +679,11 @@ function buildCol(p, c) {
     chip.style.background = c.color||'#97A0AF'; chip.textContent=c.initials;
     hdr.appendChild(chip);
   }
-  const titleEl = document.createElement('span'); titleEl.textContent = c.title; hdr.appendChild(titleEl);
+  const titleEl = document.createElement('span'); titleEl.className = 'col-title'; titleEl.textContent = c.title; hdr.appendChild(titleEl);
   const countEl = document.createElement('span'); countEl.className='col-count';
   countEl.textContent = c.cards.length; hdr.appendChild(countEl);
 
   const hdrActs = document.createElement('div'); hdrActs.className = 'col-header-acts';
-  const mlBtn = document.createElement('button'); mlBtn.className='col-act col-move'; mlBtn.title='Move left'; mlBtn.textContent='←';
-  mlBtn.addEventListener('click', e => { e.stopPropagation(); moveColLeft(p, c.id); });
-  hdrActs.appendChild(mlBtn);
-  const mrBtn = document.createElement('button'); mrBtn.className='col-act col-move'; mrBtn.title='Move right'; mrBtn.textContent='→';
-  mrBtn.addEventListener('click', e => { e.stopPropagation(); moveColRight(p, c.id); });
-  hdrActs.appendChild(mrBtn);
   const delBtn = document.createElement('button'); delBtn.className='col-act col-del'; delBtn.title='Delete column'; delBtn.textContent='×';
   delBtn.addEventListener('click', e => { e.stopPropagation(); deleteCol(p, c.id); });
   hdrActs.appendChild(delBtn);
