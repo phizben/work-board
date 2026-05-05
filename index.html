@@ -184,6 +184,31 @@ body {
 .btn-add       { font-size: 12px; }
 .btn-add-child { font-size: 11px; }
 .btn-add:hover, .btn-add-child:hover { background: rgba(9,30,66,.06); color: #5E6C84; }
+
+/* ── ADD COLUMN BUTTON ── */
+.btn-add-col {
+  flex: 0 0 auto; align-self: flex-start;
+  background: none; border: 2px dashed #C1C7D0; border-radius: 8px;
+  cursor: pointer; color: #97A0AF; padding: 8px 14px;
+  font-family: inherit; font-size: 12px; white-space: nowrap;
+  transition: background .1s, border-color .1s, color .1s;
+}
+.btn-add-col:hover { background: #E6EFFF; border-color: #4C9AFF; color: #0052CC; }
+
+/* ── COLUMN HEADER ACTIONS ── */
+.col-header-acts { display: none; gap: 2px; align-items: center; margin-left: 4px; }
+.col:hover .col-header-acts { display: flex; }
+.col:hover .col-count { display: none; }
+.col-act {
+  width: 18px; height: 18px; border: none; border-radius: 3px; cursor: pointer;
+  font-size: 11px; font-weight: 700; display: flex; align-items: center;
+  justify-content: center; font-family: inherit; line-height: 1;
+  background: transparent; color: #97A0AF;
+}
+.col-act:hover       { background: #EBECF0; color: #172B4D; }
+.col-act.col-del:hover  { background: #FFEBE6; color: #FF5630; }
+.col-act.col-move    { font-size: 13px; }
+.col-act.col-move:hover { background: #DEEBFF; color: #0052CC; }
 </style>
 </head>
 <body>
@@ -450,6 +475,42 @@ function toggleCollapse(p, cId) {
   c.collapsed = !c.collapsed; save(); reRenderCol(p, cId);
 }
 
+function deleteCol(p, cId) {
+  if (!confirm('Delete this entire column and all its contents?')) return;
+  state[p] = state[p].filter(c => c.id !== cId);
+  save(); renderPanel(p);
+}
+
+function moveColLeft(p, cId) {
+  const arr = state[p];
+  const i = arr.findIndex(c => c.id === cId);
+  if (i <= 0) return;
+  [arr[i-1], arr[i]] = [arr[i], arr[i-1]];
+  save(); renderPanel(p);
+}
+
+function moveColRight(p, cId) {
+  const arr = state[p];
+  const i = arr.findIndex(c => c.id === cId);
+  if (i < 0 || i >= arr.length - 1) return;
+  [arr[i], arr[i+1]] = [arr[i+1], arr[i]];
+  save(); renderPanel(p);
+}
+
+function addCol(p) {
+  const title = prompt((p === 'myAreas' ? 'Initiative' : 'Party') + ' name:');
+  if (!title || !title.trim()) return;
+  const newCol = { id: uid(), title: title.trim(), collapsed: false, cards: [] };
+  if (p === 'syncAgendas') {
+    const initials = title.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    const colors = ['#0052CC','#36B37E','#FF8B00','#6554C0','#00B8D9','#FF5630','#403294','#00875A'];
+    newCol.initials = initials || '?';
+    newCol.color = colors[state[p].length % colors.length];
+  }
+  state[p].push(newCol);
+  save(); renderPanel(p);
+}
+
 function commitText(p, cId, id, raw) {
   const text = raw.trim();
   if (!text) { deleteItem(p, cId, id); return; }
@@ -584,6 +645,19 @@ function buildCol(p, c) {
   const titleEl = document.createElement('span'); titleEl.textContent = c.title; hdr.appendChild(titleEl);
   const countEl = document.createElement('span'); countEl.className='col-count';
   countEl.textContent = c.cards.length; hdr.appendChild(countEl);
+
+  const hdrActs = document.createElement('div'); hdrActs.className = 'col-header-acts';
+  const mlBtn = document.createElement('button'); mlBtn.className='col-act col-move'; mlBtn.title='Move left'; mlBtn.textContent='←';
+  mlBtn.addEventListener('click', e => { e.stopPropagation(); moveColLeft(p, c.id); });
+  hdrActs.appendChild(mlBtn);
+  const mrBtn = document.createElement('button'); mrBtn.className='col-act col-move'; mrBtn.title='Move right'; mrBtn.textContent='→';
+  mrBtn.addEventListener('click', e => { e.stopPropagation(); moveColRight(p, c.id); });
+  hdrActs.appendChild(mrBtn);
+  const delBtn = document.createElement('button'); delBtn.className='col-act col-del'; delBtn.title='Delete column'; delBtn.textContent='×';
+  delBtn.addEventListener('click', e => { e.stopPropagation(); deleteCol(p, c.id); });
+  hdrActs.appendChild(delBtn);
+  hdr.appendChild(hdrActs);
+
   const chevron = document.createElement('button'); chevron.className='col-chevron';
   chevron.textContent = c.collapsed ? '▸' : '▾'; chevron.title = 'Collapse / expand';
   chevron.addEventListener('click', e => { e.stopPropagation(); toggleCollapse(p, c.id); });
@@ -611,12 +685,20 @@ function reRenderCol(p, cId) {
   if (old) track.replaceChild(fresh, old); else track.appendChild(fresh);
 }
 
+function renderPanel(p) {
+  const track = document.getElementById('track-'+p);
+  track.innerHTML = '';
+  (state[p]||[]).forEach(c => track.appendChild(buildCol(p, c)));
+  const addColBtn = document.createElement('button');
+  addColBtn.className = 'btn-add-col';
+  addColBtn.textContent = '＋ ' + (p === 'myAreas' ? 'Initiative' : 'Party');
+  addColBtn.addEventListener('click', () => addCol(p));
+  track.appendChild(addColBtn);
+}
+
 function renderAll() {
-  ['myAreas','syncAgendas'].forEach(p => {
-    const track = document.getElementById('track-'+p);
-    track.innerHTML = '';
-    (state[p]||[]).forEach(c => track.appendChild(buildCol(p, c)));
-  });
+  renderPanel('myAreas');
+  renderPanel('syncAgendas');
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
