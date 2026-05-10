@@ -126,8 +126,8 @@ body {
 /* ── EXPAND BUTTON ── */
 .item-expand {
   background: none; border: none; cursor: pointer; color: #97A0AF;
-  font-size: 10px; padding: 1px 0; line-height: 1; font-family: inherit;
-  flex-shrink: 0; margin-top: 2px;
+  font-size: 10px; padding: 1px 2px; line-height: 1; font-family: inherit;
+  flex-shrink: 0; margin-top: 2px; white-space: nowrap;
 }
 .item-expand:hover { color: #5E6C84; }
 
@@ -172,6 +172,7 @@ body {
 .act.del:hover    { background: #FFEBE6; color: #FF5630; }
 .act.move         { color: #5E6C84; font-size: 13px; }
 .act.move:hover   { background: #DEEBFF; color: #0052CC; }
+.act.unnest:hover { background: #E3FCEF; color: #006644; }
 
 /* ── CHILDREN ── */
 .children {
@@ -509,6 +510,31 @@ function findWithParent(items, id) {
   return null;
 }
 
+// Returns array of { arr, index, item } from root down to the target
+function findPath(items, id, path = []) {
+  for (let i = 0; i < items.length; i++) {
+    const step = { arr: items, index: i, item: items[i] };
+    if (items[i].id === id) return [...path, step];
+    if (items[i].children?.length) {
+      const r = findPath(items[i].children, id, [...path, step]);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+function unNestItem(p, cId, itemId) {
+  const cards = col(p, cId)?.cards; if (!cards) return;
+  const path = findPath(cards, itemId);
+  if (!path || path.length < 2) return;           // already top-level
+  const self   = path[path.length - 1];
+  const parent = path[path.length - 2];
+  self.arr.splice(self.index, 1);                 // remove from current parent
+  const parentIdx = parent.arr.findIndex(x => x.id === parent.item.id);
+  parent.arr.splice(parentIdx + 1, 0, self.item); // insert after parent
+  save(); renderPanel(p);
+}
+
 function moveCardTo(p, cId, dragId, targetId, position) {
   const cards = col(p, cId)?.cards; if (!cards) return;
   const src = findWithParent(cards, dragId); if (!src) return;
@@ -705,8 +731,9 @@ function buildItem(p, cId, item, depth) {
   if (depth < MAX_DEPTH) {
     const xBtn = document.createElement('button');
     xBtn.className = 'item-expand';
-    xBtn.textContent = item.expanded ? '▾' : '▸';
-    xBtn.title = item.expanded ? 'Collapse' : 'Expand';
+    const childCount = (item.children || []).length;
+    xBtn.textContent = item.expanded ? '▾' : (childCount ? `▸${childCount}` : '▸');
+    xBtn.title = item.expanded ? 'Collapse' : (childCount ? `Expand (${childCount} items)` : 'Expand');
     xBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); toggleExpand(p, cId, item.id); });
     div.appendChild(xBtn);
   }
@@ -747,6 +774,12 @@ function buildItem(p, cId, item, depth) {
     const rb = document.createElement('button'); rb.className='act move'; rb.title='Move right'; rb.textContent='→';
     rb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); moveDown(p,cId,item.id); });
     acts.appendChild(rb);
+  }
+
+  if (depth > 0) {
+    const unb = document.createElement('button'); unb.className='act unnest'; unb.title='Un-nest (move up one level)'; unb.textContent='↖';
+    unb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); unNestItem(p,cId,item.id); });
+    acts.appendChild(unb);
   }
 
   const ub = document.createElement('button'); ub.className='act urgent'; ub.title='Toggle urgent'; ub.textContent='!';
@@ -848,6 +881,7 @@ function buildCol(p, c) {
   chevron.textContent = c.collapsed ? '▸' : '▾'; chevron.title = 'Collapse / expand';
   chevron.addEventListener('click', e => { e.stopPropagation(); toggleCollapse(p, c.id); });
   hdr.appendChild(chevron);
+  hdr.addEventListener('dblclick', e => { if (e.target.tagName !== 'BUTTON') toggleCollapse(p, c.id); });
   div.appendChild(hdr);
 
   if (!c.collapsed) {
