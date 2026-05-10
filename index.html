@@ -153,11 +153,12 @@ body {
 
 /* ── HOVER ACTIONS ── */
 .card-actions {
-  display: none; gap: 3px; align-items: center;
+  display: flex; gap: 3px; align-items: center;
   margin-top: 5px; flex-wrap: wrap;
+  visibility: hidden; opacity: 0; transition: opacity .1s;
 }
 .card:hover .card-actions,
-.card.editing .card-actions { display: flex; }
+.card.editing .card-actions { visibility: visible; opacity: 1; }
 .act {
   width: 20px; height: 20px; border: none; border-radius: 3px; cursor: pointer;
   font-size: 11px; font-weight: 700; display: flex; align-items: center;
