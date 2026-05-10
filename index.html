@@ -727,6 +727,15 @@ function buildItem(p, cId, item, depth) {
     _cardDrag = null; _dropTargetId = null; _dropPosition = null;
   });
 
+  // Double-click to expand / collapse
+  if (depth < MAX_DEPTH) {
+    div.addEventListener('dblclick', e => {
+      if (e.target.closest('[contenteditable="true"]')) return; // ignore while editing
+      if (e.target.tagName === 'BUTTON') return;
+      toggleExpand(p, cId, item.id);
+    });
+  }
+
   // Expand toggle (depth 0 and 1 only)
   if (depth < MAX_DEPTH) {
     const xBtn = document.createElement('button');
