@@ -216,6 +216,12 @@ body {
 .col-act.col-move    { font-size: 13px; }
 .col-act.col-move:hover { background: #DEEBFF; color: #0052CC; }
 
+/* ── CARD DRAG ── */
+.card.card-dragging  { opacity: 0.35; }
+.card.drop-before    { border-top: 2px solid #4C9AFF !important; }
+.card.drop-after     { border-bottom: 2px solid #4C9AFF !important; }
+.card.drop-inside    { box-shadow: 0 0 0 2px #4C9AFF !important; }
+
 /* ── DRAG HANDLE ── */
 .col-drag-handle {
   color: #C1C7D0; font-size: 13px; cursor: grab; flex-shrink: 0;
@@ -431,6 +437,9 @@ let showDone = true;
 let _dragPanel = null;
 let _dragColId = null;
 let _lastState = null;
+let _cardDrag = null;      // { p, cId, itemId }
+let _dropTargetId = null;
+let _dropPosition = null;  // 'before' | 'after' | 'inside'
 let _toastTimer = null;
 
 function showSaved(msg) {
@@ -487,6 +496,35 @@ function removeItem(items, id) {
 
 function colFindItem(p, cId, id) {
   const c = col(p, cId); return c ? findItem(c.cards, id) : null;
+}
+
+function findWithParent(items, id) {
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].id === id) return { item: items[i], arr: items, index: i };
+    if (items[i].children?.length) {
+      const r = findWithParent(items[i].children, id);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+function moveCardTo(p, cId, dragId, targetId, position) {
+  const cards = col(p, cId)?.cards; if (!cards) return;
+  const src = findWithParent(cards, dragId); if (!src) return;
+  if (position === 'inside') {
+    const tgtItem = findItem(cards, targetId); if (!tgtItem) return;
+    src.arr.splice(src.index, 1);
+    if (!tgtItem.children) tgtItem.children = [];
+    tgtItem.children.unshift(src.item);
+    tgtItem.expanded = true;
+  } else {
+    src.arr.splice(src.index, 1);                             // remove first
+    const tgt = findWithParent(cards, targetId); if (!tgt) return; // re-find (index may shift)
+    const at = position === 'before' ? tgt.index : tgt.index + 1;
+    tgt.arr.splice(at, 0, src.item);
+  }
+  save(); renderPanel(p);
 }
 
 // ── MUTATIONS ─────────────────────────────────────────────────────────────────
@@ -619,6 +657,50 @@ function buildItem(p, cId, item, depth) {
   div.id = 'card-'+item.id;
   if (!showDone && item.done) div.style.display = 'none';
 
+  // Card drag-and-drop
+  div.setAttribute('draggable', 'true');
+  div.addEventListener('dragstart', e => {
+    e.stopPropagation();
+    _cardDrag = { p, cId, itemId: item.id };
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => div.classList.add('card-dragging'), 0);
+  });
+  div.addEventListener('dragend', () => {
+    div.classList.remove('card-dragging');
+    document.querySelectorAll('.card.drop-before,.card.drop-after,.card.drop-inside')
+      .forEach(el => el.classList.remove('drop-before','drop-after','drop-inside'));
+    _cardDrag = null; _dropTargetId = null; _dropPosition = null;
+  });
+  div.addEventListener('dragover', e => {
+    if (!_cardDrag || _cardDrag.p !== p || _cardDrag.cId !== cId) return;
+    if (_cardDrag.itemId === item.id) return;
+    e.preventDefault(); e.stopPropagation();
+    document.querySelectorAll('.card.drop-before,.card.drop-after,.card.drop-inside')
+      .forEach(el => el.classList.remove('drop-before','drop-after','drop-inside'));
+    const rect = div.getBoundingClientRect();
+    const ratio = (e.clientY - rect.top) / rect.height;
+    if (depth < MAX_DEPTH && ratio > 0.3 && ratio < 0.7) {
+      div.classList.add('drop-inside'); _dropPosition = 'inside';
+    } else if (ratio < 0.5) {
+      div.classList.add('drop-before'); _dropPosition = 'before';
+    } else {
+      div.classList.add('drop-after');  _dropPosition = 'after';
+    }
+    _dropTargetId = item.id;
+  });
+  div.addEventListener('dragleave', e => {
+    if (!div.contains(e.relatedTarget))
+      div.classList.remove('drop-before','drop-after','drop-inside');
+  });
+  div.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
+    div.classList.remove('drop-before','drop-after','drop-inside');
+    if (!_cardDrag || !_dropTargetId || !_dropPosition) return;
+    if (_cardDrag.itemId === item.id) return;
+    moveCardTo(_cardDrag.p, _cardDrag.cId, _cardDrag.itemId, _dropTargetId, _dropPosition);
+    _cardDrag = null; _dropTargetId = null; _dropPosition = null;
+  });
+
   // Expand toggle (depth 0 and 1 only)
   if (depth < MAX_DEPTH) {
     const xBtn = document.createElement('button');
@@ -708,18 +790,8 @@ function buildCol(p, c) {
   const div = document.createElement('div');
   div.className = 'col' + (c.collapsed ? ' collapsed' : '');
   div.id = 'col-'+c.id;
-  div.setAttribute('draggable', 'true');
-
-  div.addEventListener('dragstart', e => {
-    _dragPanel = p; _dragColId = c.id;
-    e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => div.classList.add('dragging-opacity'), 0);
-  });
-  div.addEventListener('dragend', () => {
-    div.classList.remove('dragging-opacity');
-    document.querySelectorAll('.col.drag-over').forEach(el => el.classList.remove('drag-over'));
-  });
   div.addEventListener('dragover', e => {
+    if (_cardDrag) return;          // card drag in progress — ignore column drop
     if (_dragPanel !== p) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -729,6 +801,7 @@ function buildCol(p, c) {
     if (!div.contains(e.relatedTarget)) div.classList.remove('drag-over');
   });
   div.addEventListener('drop', e => {
+    if (_cardDrag) return;
     e.preventDefault();
     div.classList.remove('drag-over');
     if (_dragPanel !== p || _dragColId === c.id) return;
@@ -740,8 +813,20 @@ function buildCol(p, c) {
     save(); renderPanel(p);
   });
 
-  // Header
+  // Header — draggable for column reordering
   const hdr = document.createElement('div'); hdr.className = 'col-header';
+  hdr.setAttribute('draggable', 'true');
+  hdr.addEventListener('dragstart', e => {
+    _dragPanel = p; _dragColId = c.id;
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
+    setTimeout(() => div.classList.add('dragging-opacity'), 0);
+  });
+  hdr.addEventListener('dragend', () => {
+    div.classList.remove('dragging-opacity');
+    document.querySelectorAll('.col.drag-over').forEach(el => el.classList.remove('drag-over'));
+    _dragPanel = null; _dragColId = null;
+  });
   if (c.initials) {
     const chip = document.createElement('span'); chip.className='person-chip';
     chip.style.background = c.color||'#97A0AF'; chip.textContent=c.initials;
