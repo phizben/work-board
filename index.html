@@ -153,7 +153,8 @@ body {
 
 /* ── HOVER ACTIONS ── */
 .card-actions {
-  position: absolute; top: 4px; right: 4px; display: none; gap: 2px; align-items: center;
+  display: none; gap: 3px; align-items: center;
+  margin-top: 5px; flex-wrap: wrap;
 }
 .card:hover .card-actions,
 .card.editing .card-actions { display: flex; }
@@ -174,7 +175,8 @@ body {
 
 /* ── CHILDREN ── */
 .children {
-  margin-left: 14px; margin-top: 3px;
+  margin-left: 8px; margin-top: 3px;
+  border-left: 2px solid #DFE1E6; padding-left: 10px;
   display: flex; flex-direction: column; gap: 4px;
 }
 
@@ -213,6 +215,38 @@ body {
 .col-act.col-del:hover  { background: #FFEBE6; color: #FF5630; }
 .col-act.col-move    { font-size: 13px; }
 .col-act.col-move:hover { background: #DEEBFF; color: #0052CC; }
+
+/* ── DRAG HANDLE ── */
+.col-drag-handle {
+  color: #C1C7D0; font-size: 13px; cursor: grab; flex-shrink: 0;
+  line-height: 1; user-select: none; padding: 0 2px;
+}
+.col:hover .col-drag-handle { color: #97A0AF; }
+
+/* ── SAVED TOAST ── */
+#saved-toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: #36B37E; color: #fff;
+  font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  padding: 6px 14px; border-radius: 20px;
+  opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 9999;
+}
+#saved-toast.show { opacity: 1; }
+
+/* ── PANEL TOGGLE ── */
+.panel-tabs {
+  display: flex; gap: 4px;
+}
+.panel-tab {
+  padding: 5px 12px; font-size: 12px; font-weight: 600; font-family: inherit;
+  border: 1px solid #DFE1E6; border-radius: 4px; cursor: pointer;
+  background: #F4F5F7; color: #6B778C; transition: background .1s, color .1s;
+}
+.panel-tab.active { background: #0052CC; color: #fff; border-color: #0052CC; }
+.panel-tab:not(.active):hover { background: #EBECF0; }
+.panel.hidden { display: none; }
+.panel-left.full,
+.panel-right.full { flex: 1; border-right: none; }
 </style>
 </head>
 <body>
@@ -224,6 +258,11 @@ body {
     <span class="header-date" id="hdr-date"></span>
   </div>
   <div class="header-right">
+    <div class="panel-tabs">
+      <button class="panel-tab active" id="tab-myAreas" onclick="switchPanel('myAreas')">My Areas</button>
+      <button class="panel-tab" id="tab-syncAgendas" onclick="switchPanel('syncAgendas')">Sync Agendas</button>
+      <button class="panel-tab" id="tab-both" onclick="switchPanel('both')">Both</button>
+    </div>
     <label class="toggle-label"><input type="checkbox" id="toggle-done" checked> Show done</label>
     <button class="btn-header" onclick="exportJSON()">Export JSON</button>
     <button class="btn-header" onclick="resetBoard()" style="color:#FF5630">Reset</button>
@@ -391,8 +430,39 @@ let state = (() => {
 let showDone = true;
 let _dragPanel = null;
 let _dragColId = null;
+let _lastState = null;
+let _toastTimer = null;
 
-function save() { localStorage.setItem(LS, JSON.stringify(state)); }
+function showSaved(msg) {
+  const t = document.getElementById('saved-toast');
+  if (!t) return;
+  t.textContent = msg || '✓ Saved';
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+function save() {
+  const prev = localStorage.getItem(LS);
+  if (prev) _lastState = prev;
+  localStorage.setItem(LS, JSON.stringify(state));
+  showSaved();
+}
+
+function undoLast() {
+  if (!_lastState) return;
+  state = JSON.parse(_lastState);
+  _lastState = null;
+  localStorage.setItem(LS, JSON.stringify(state));
+  renderAll();
+  showSaved('↩ Undone');
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault(); undoLast();
+  }
+});
 function resetBoard() {
   if (!confirm('Reset board to default data? This cannot be undone.')) return;
   state = defaultState(); save(); renderAll();
@@ -565,7 +635,6 @@ function buildItem(p, cId, item, depth) {
   const textEl = document.createElement('div');
   textEl.className = 'card-text'; textEl.id = 'ct-'+item.id;
   textEl.textContent = item.text; textEl.contentEditable = 'false';
-  textEl.style.paddingRight = '54px'; // space for action buttons
   textEl.addEventListener('click', e => { if (textEl.contentEditable !== 'true') { startEdit(textEl); e.stopPropagation(); } });
   textEl.addEventListener('keydown', e => {
     if (e.key === 'Escape') { textEl.textContent = item.text; textEl.blur(); }
@@ -586,9 +655,7 @@ function buildItem(p, cId, item, depth) {
   badge.addEventListener('click', e => { e.stopPropagation(); toggleType(p, cId, item.id); });
   body.appendChild(badge);
 
-  div.appendChild(body);
-
-  // Hover actions
+  // Hover actions (inside body so they flow below text, not over it)
   const acts = document.createElement('div'); acts.className = 'card-actions';
 
   if (depth === 0) {
@@ -614,7 +681,8 @@ function buildItem(p, cId, item, depth) {
   xb.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); deleteItem(p,cId,item.id); });
   acts.appendChild(xb);
 
-  div.appendChild(acts);
+  body.appendChild(acts);
+  div.appendChild(body);
   wrapper.appendChild(div);
 
   // Children section (when expanded)
@@ -679,6 +747,8 @@ function buildCol(p, c) {
     chip.style.background = c.color||'#97A0AF'; chip.textContent=c.initials;
     hdr.appendChild(chip);
   }
+  const dragHandle = document.createElement('span'); dragHandle.className = 'col-drag-handle'; dragHandle.textContent = '⠿'; dragHandle.title = 'Drag to reorder';
+  hdr.appendChild(dragHandle);
   const titleEl = document.createElement('span'); titleEl.className = 'col-title'; titleEl.textContent = c.title; hdr.appendChild(titleEl);
   const countEl = document.createElement('span'); countEl.className='col-count';
   countEl.textContent = c.cards.length; hdr.appendChild(countEl);
@@ -732,6 +802,27 @@ function renderAll() {
   renderPanel('syncAgendas');
 }
 
+// ── PANEL TOGGLE ──────────────────────────────────────────────────────────────
+let _activePanel = 'myAreas';
+function switchPanel(which) {
+  _activePanel = which;
+  const left  = document.querySelector('.panel-left');
+  const right = document.querySelector('.panel-right');
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + (which === 'both' ? 'both' : which)).classList.add('active');
+  if (which === 'both') {
+    left.classList.remove('hidden', 'full');
+    right.classList.remove('hidden', 'full');
+    left.style.flex = '';
+  } else if (which === 'myAreas') {
+    left.classList.remove('hidden'); left.classList.add('full');
+    right.classList.add('hidden'); right.classList.remove('full');
+  } else {
+    right.classList.remove('hidden'); right.classList.add('full');
+    left.classList.add('hidden'); left.classList.remove('full');
+  }
+}
+
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 function exportJSON() {
   const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
@@ -748,5 +839,6 @@ document.getElementById('toggle-done').addEventListener('change', function() {
 });
 renderAll();
 </script>
+<div id="saved-toast">✓ Saved</div>
 </body>
 </html>
